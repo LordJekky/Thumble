@@ -63,6 +63,8 @@ public class EnemyData
 
     public bool IsInterecting(float Circle_x, float Circle_y, float Circle_Radius)
     {
+        //this is not working correctly
+
         float rel_x = Circle_x - Sprite.transform.position.x;
         float rel_y = Circle_y - Sprite.transform.position.y;
 
