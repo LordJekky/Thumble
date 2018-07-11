@@ -2,6 +2,31 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public class Point2D
+{
+    public float X;
+    public float Y;
+
+
+    public Point2D(float X, float Y)
+    {
+        this.X = X;
+        this.Y = Y;
+    }
+
+    public Point2D Rotate(float OriginX, float OriginY, float Angle)
+    {
+        //assuming angle is in degrees, because unity does them that way for some reason
+
+        Angle = Angle * (Mathf.PI / 180f);
+
+        float px = Mathf.Cos(Angle) * (X - OriginX) - Mathf.Sin(Angle) * (Y - OriginY) + OriginX;
+        float py = Mathf.Sin(Angle) * (X - OriginX) + Mathf.Cos(Angle) * (Y - OriginY) + OriginY;
+
+        return new Point2D(px, py);
+    }
+}
+
 public class EnemyData
 {
     GameObject Sprite;
