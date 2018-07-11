@@ -61,8 +61,8 @@ public class EnemyData
         Sprite = new GameObject("Enemy" + EnemyIndex++);
         Renderer = Sprite.AddComponent<SpriteRenderer>();
 
-        SpriteWidth = Renderer.bounds.size.x;
-        SpriteHeight = Renderer.bounds.size.y;
+        SpriteWidth = Renderer.bounds.size.x * 0.9f;
+        SpriteHeight = Renderer.bounds.size.y * 0.9f;
 
         Renderer.sprite = Resources.Load<Sprite>("KnifeEnemy");
 
