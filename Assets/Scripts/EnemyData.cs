@@ -11,6 +11,8 @@ public class EnemyData
     float MoveSpeed = 0.075f;
     float RotateSpeed = 2f;
 
+    float SpriteWidth, SpriteHeight;
+
     public bool Disposed;
 
     static int EnemyIndex = 0;
@@ -34,6 +36,9 @@ public class EnemyData
         Sprite = new GameObject("Enemy" + EnemyIndex++);
         Renderer = Sprite.AddComponent<SpriteRenderer>();
 
+        SpriteWidth = Renderer.bounds.size.x;
+        SpriteHeight = Renderer.bounds.size.y;
+
         Renderer.sprite = Resources.Load<Sprite>("KnifeEnemy");
 
         Sprite.transform.position = new Vector3(Xpos, Ypos, -3);
@@ -50,80 +55,90 @@ public class EnemyData
         }
     }
 
-    public bool IsInterecting(float Circle_x, float Circle_y, float Circle_Radius)
+    float sign(Point2D p1, Point2D p2, Point2D p3)
     {
-        //this is not working correctly
-
-        float rel_x = Circle_x - Sprite.transform.position.x;
-        float rel_y = Circle_y - Sprite.transform.position.y;
-
-        float angle = -Sprite.transform.rotation.eulerAngles.z;
-        angle = angle * (Mathf.PI / 180f);
-
-        float local_x = Mathf.Cos(angle) * rel_x - Mathf.Sin(angle) * rel_y + Sprite.transform.position.x;
-        float local_y = Mathf.Sin(angle) * rel_x + Mathf.Cos(angle) * rel_y + Sprite.transform.position.y;
-
-        float minx = -0.5f;
-        float maxx = 0.5f;
-
-        float miny = -1.24f;
-        float maxy = 1.24f;
-
-        float delta_x = local_x;
-        if (delta_x < minx) delta_x = minx;
-        if (delta_x > maxx) delta_x = maxx;
-
-        float delta_y = local_y;
-        if (delta_y < miny) delta_y = miny;
-        if (delta_y > maxy) delta_y = maxy;
-
-        delta_x = Mathf.Abs(local_x - delta_x);
-        delta_y = Mathf.Abs(local_y - delta_y);
-
-        return delta_x * delta_x + delta_y * delta_y < Circle_Radius * Circle_Radius;
+        return (p1.X - p3.X) * (p2.Y - p3.Y) - (p2.X - p3.X) * (p1.Y - p3.Y);
     }
 
-    public bool IsInterectingDebug(float Circle_x, float Circle_y, float Circle_Radius)
+    bool PointInTriangle(Point2D pt, Point2D v1, Point2D v2, Point2D v3)
     {
-        MonoBehaviour.print("cx: " + Circle_x + ", cy: " + Circle_y + ", cr: " + Circle_Radius);
+        bool b1, b2, b3;
 
-        float rel_x = Circle_x - Sprite.transform.position.x;
-        float rel_y = Circle_y - Sprite.transform.position.y;
+        b1 = sign(pt, v1, v2) < 0.0f;
+        b2 = sign(pt, v2, v3) < 0.0f;
+        b3 = sign(pt, v3, v1) < 0.0f;
 
-        MonoBehaviour.print("relx: " + rel_x + ", rely: " + rel_y);
+        return ((b1 == b2) && (b2 == b3));
+    }
 
-        float angle = -Sprite.transform.rotation.eulerAngles.z;
-        angle = angle * (Mathf.PI / 180f);
+    float GetDistance(Point2D A, Point2D B)
+    {
+        float LenX = Mathf.Abs(A.X - B.X);
+        float LenY = Mathf.Abs(A.Y - B.Y);
 
-        MonoBehaviour.print("angle: " + angle);
+        return Mathf.Sqrt((LenX * LenX) + (LenY * LenY));
+    }
 
-        float local_x = Mathf.Cos(angle) * rel_x - Mathf.Sin(angle) * rel_y + Sprite.transform.position.x;
-        float local_y = Mathf.Sin(angle) * rel_x + Mathf.Cos(angle) * rel_y + Sprite.transform.position.y;
+    float GetDistanceSquared(Point2D A, Point2D B)
+    {
+        float LenX = Mathf.Abs(A.X - B.X);
+        float LenY = Mathf.Abs(A.Y - B.Y);
 
-        MonoBehaviour.print("localx: " + local_x + ", localy: " + local_y);
+        return (LenX * LenX) + (LenY * LenY);
+    }
 
-        float minx = -0.5f;
-        float maxx = 0.5f;
+    float GetDistanceToLineSegment(Vector2 SegmentStart, Vector2 SegmentEnd, Vector2 p)
+    {
+        // Return minimum distance between line segment vw and point p
+        float l2 = (SegmentEnd - SegmentStart).sqrMagnitude;
 
-        float miny = -1.24f;
-        float maxy = 1.24f;
+        if (l2 == 0.0) return (SegmentStart-p).magnitude;   // v == w case
 
-        float delta_x = local_x;
-        if (delta_x < minx) delta_x = minx;
-        if (delta_x > maxx) delta_x = maxx;
+        // Consider the line extending the segment, parameterized as v + t (w - v).
+        // We find projection of point p onto the line. 
+        // It falls where t = [(p-v) . (w-v)] / |w-v|^2
+        // We clamp t from [0,1] to handle points outside the segment vw.
 
-        float delta_y = local_y;
-        if (delta_y < miny) delta_y = miny;
-        if (delta_y > maxy) delta_y = maxy;
+        float t = Mathf.Max(0, Mathf.Min(1, Vector2.Dot(p - SegmentStart, SegmentEnd - SegmentStart) / l2));
+        Vector2 projection = SegmentStart + t * (SegmentEnd - SegmentStart);  // Projection falls on the segment
+        return (p - projection).magnitude;
+    }
 
-        MonoBehaviour.print("nearx: " + delta_x + ", neary: " + delta_y);
+    public bool IsInterecting(float Circle_x, float Circle_y, float Circle_Radius)
+    {
+        //get the 4 corners of the sprite rect (unrotated)
+        Point2D p1 = new Point2D(Sprite.transform.position.x - (SpriteWidth / 2f), Sprite.transform.position.y - (SpriteHeight / 2f));   //bottom-left
+        Point2D p2 = new Point2D(Sprite.transform.position.x + (SpriteWidth / 2f), Sprite.transform.position.y - (SpriteHeight / 2f));  //bottom-right
+        Point2D p3 = new Point2D(Sprite.transform.position.x + (SpriteWidth / 2f), Sprite.transform.position.y + (SpriteHeight / 2f));  //top-left
+        Point2D p4 = new Point2D(Sprite.transform.position.x - (SpriteWidth / 2f), Sprite.transform.position.y + (SpriteHeight / 2f));  //top-right
 
-        delta_x = Mathf.Abs(local_x - delta_x);
-        delta_y = Mathf.Abs(local_y - delta_y);
+        //apply rotation to the 4 corners to get the -actual- rectangle
+        p1 = p1.Rotate(Sprite.transform.position.x, Sprite.transform.position.y, Sprite.transform.eulerAngles.z);
+        p2 = p2.Rotate(Sprite.transform.position.x, Sprite.transform.position.y, Sprite.transform.eulerAngles.z);
+        p3 = p3.Rotate(Sprite.transform.position.x, Sprite.transform.position.y, Sprite.transform.eulerAngles.z);
+        p4 = p4.Rotate(Sprite.transform.position.x, Sprite.transform.position.y, Sprite.transform.eulerAngles.z);
 
-        MonoBehaviour.print("deltax: " + delta_x + ", deltay: " + delta_y);
+        //split into 2 triangles - 1,2,3 and 3,4,1 (CCW winding)
+        //test if the thumb center point is inside one of the triangles
+        Point2D ThumbPoint = new Point2D(Circle_x, Circle_y);
 
-        return delta_x * delta_x + delta_y * delta_y < Circle_Radius * Circle_Radius;
+        if (PointInTriangle(ThumbPoint, p1, p2, p3)) return true;
+        if (PointInTriangle(ThumbPoint, p3, p4, p1)) return true;
+
+        Vector2 v1 = new Vector2(p1.X, p1.Y);
+        Vector2 v2 = new Vector2(p2.X, p2.Y);
+        Vector2 v3 = new Vector2(p3.X, p3.Y);
+        Vector2 v4 = new Vector2(p4.X, p4.Y);
+        Vector2 Vt = new Vector2(ThumbPoint.X, ThumbPoint.Y);
+
+        //if not, test for closest point on the edge of the rect to the thumb point
+        //and check for distance <= radius
+        if (GetDistanceToLineSegment(v1, v2, Vt) <= Circle_Radius) return true;
+        if (GetDistanceToLineSegment(v2, v3, Vt) <= Circle_Radius) return true;
+        if (GetDistanceToLineSegment(v3, v4, Vt) <= Circle_Radius) return true;
+        if (GetDistanceToLineSegment(v4, v1, Vt) <= Circle_Radius) return true;
+
+        return false;
     }
 
     public void Dispose()
