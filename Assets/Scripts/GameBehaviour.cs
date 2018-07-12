@@ -13,7 +13,7 @@ enum GameStates
     ThumbLifted
 }
 
-public class EnemyData
+/*public class EnemyData
 {
     GameObject Sprite;
     SpriteRenderer Renderer;
@@ -159,7 +159,7 @@ public class EnemyData
         if (Sprite.transform.position.x > (TilesX / 2f) + 1.5f) Dispose();
         if (Sprite.transform.position.y < (-TilesY / 2f) - 1.5f) Dispose();
     }
-}
+}*/
 
 public class GameBehaviour : MonoBehaviour 
 {
