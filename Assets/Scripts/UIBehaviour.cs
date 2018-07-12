@@ -125,9 +125,9 @@ public class UIBehaviour : MonoBehaviour
                                 NewY = (Screen.height / 2) + (ChildObject.transform as RectTransform).rect.height;
                             }
 
-                            Vector3 Pos = ChildObject.transform.localPosition;
+                            Vector3 Pos = ChildObject.transform.position;
                             Pos.y = NewY;
-                            ChildObject.transform.localPosition = Pos;
+                            ChildObject.transform.position = Pos;
 
                             MovingObjects.Add(new MovingUIObject(ChildObject, Y, 30f));
                         }
@@ -183,6 +183,8 @@ public class UIBehaviour : MonoBehaviour
             }
 
             MovingObjects.Add(new MovingUIObject(ChildObject, Y, 30f));
+
+            //print(ChildObject.name + ": " + ChildObject.transform.localPosition + " : " + Y);
         }
 
         State = UIAnimationStates.ClearingPanel;
