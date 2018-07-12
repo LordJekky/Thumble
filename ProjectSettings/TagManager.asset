@@ -6,6 +6,7 @@ TagManager:
   tags:
   - MainMenu
   - UIPanel
+  - Fade
   layers:
   - Default
   - TransparentFX
