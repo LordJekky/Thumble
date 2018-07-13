@@ -30,6 +30,8 @@ class FadingUIObject
         ImgComp = UIObject.GetComponent<Image>();
         OriginalColour = ImgComp.color;
 
+        MonoBehaviour.print(OriginalColour);
+
         if (FadeIn)
         {
             Color c = ImgComp.color;
@@ -50,6 +52,7 @@ class FadingUIObject
         if (FadeIn)
         {
             c.a += Speed;
+            if (c.a > 1) c.a = 1;
             if (c.a == OriginalColour.a) Completed = true;
         }
         else
@@ -280,6 +283,7 @@ public class UIBehaviour : MonoBehaviour
                         O.Update();
                         if (O.Completed)
                         {
+                            O.Dispose();
                             FadingObjects.Remove(O);
                         }
                     }
@@ -311,7 +315,6 @@ public class UIBehaviour : MonoBehaviour
             }
             else
             {
-
                 Vector2 Target = GetObjectSlideTarget(ChildObject);
                 MovingObjects.Add(new MovingUIObject(ChildObject, Target, 30f));
             }
