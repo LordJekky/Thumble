@@ -61,10 +61,10 @@ public class EnemyData
         Sprite = new GameObject("Enemy" + EnemyIndex++);
         Renderer = Sprite.AddComponent<SpriteRenderer>();
 
+        Renderer.sprite = Resources.Load<Sprite>("KnifeEnemy");
+
         SpriteWidth = Renderer.bounds.size.x * 0.9f;
         SpriteHeight = Renderer.bounds.size.y * 0.9f;
-
-        Renderer.sprite = Resources.Load<Sprite>("KnifeEnemy");
 
         Sprite.transform.position = new Vector3(Xpos, Ypos, -3);
 
@@ -137,18 +137,31 @@ public class EnemyData
         Point2D p3 = new Point2D(Sprite.transform.position.x + (SpriteWidth / 2f), Sprite.transform.position.y + (SpriteHeight / 2f));  //top-left
         Point2D p4 = new Point2D(Sprite.transform.position.x - (SpriteWidth / 2f), Sprite.transform.position.y + (SpriteHeight / 2f));  //top-right
 
+        //MonoBehaviour.print(p1.X + ", " + p1.Y + " : " + p2.X + ", " + p2.Y + " : " + p3.X + ", " + p3.Y + " : " + p4.X + ", " + p4.Y);
+
         //apply rotation to the 4 corners to get the -actual- rectangle
         p1 = p1.Rotate(Sprite.transform.position.x, Sprite.transform.position.y, Sprite.transform.eulerAngles.z);
         p2 = p2.Rotate(Sprite.transform.position.x, Sprite.transform.position.y, Sprite.transform.eulerAngles.z);
         p3 = p3.Rotate(Sprite.transform.position.x, Sprite.transform.position.y, Sprite.transform.eulerAngles.z);
         p4 = p4.Rotate(Sprite.transform.position.x, Sprite.transform.position.y, Sprite.transform.eulerAngles.z);
 
+        //MonoBehaviour.print(p1.X + ", " + p1.Y + " : " + p2.X + ", " + p2.Y + " : " + p3.X + ", " + p3.Y + " : " + p4.X + ", " + p4.Y);
+
         //split into 2 triangles - 1,2,3 and 3,4,1 (CCW winding)
         //test if the thumb center point is inside one of the triangles
         Point2D ThumbPoint = new Point2D(Circle_x, Circle_y);
 
-        if (PointInTriangle(ThumbPoint, p1, p2, p3)) return true;
-        if (PointInTriangle(ThumbPoint, p3, p4, p1)) return true;
+        if (PointInTriangle(ThumbPoint, p1, p2, p3))
+        {
+            //MonoBehaviour.print("Inside triangle A");
+            //MonoBehaviour.print(ThumbPoint.X + ", " + ThumbPoint.Y + " : " + p1.X + ", " + p1.Y + " : " + p2.X + ", " + p2.Y + " : " + p3.X + ", " + p3.Y);
+            return true;
+        }
+        if (PointInTriangle(ThumbPoint, p3, p4, p1))
+        {
+            //MonoBehaviour.print("Inside triangle B");
+            return true;
+        }
 
         Vector2 v1 = new Vector2(p1.X, p1.Y);
         Vector2 v2 = new Vector2(p2.X, p2.Y);
@@ -158,10 +171,29 @@ public class EnemyData
 
         //if not, test for closest point on the edge of the rect to the thumb point
         //and check for distance <= radius
-        if (GetDistanceToLineSegment(v1, v2, Vt) <= Circle_Radius) return true;
-        if (GetDistanceToLineSegment(v2, v3, Vt) <= Circle_Radius) return true;
-        if (GetDistanceToLineSegment(v3, v4, Vt) <= Circle_Radius) return true;
-        if (GetDistanceToLineSegment(v4, v1, Vt) <= Circle_Radius) return true;
+
+        Circle_Radius *= 0.9f;
+
+        if (GetDistanceToLineSegment(v1, v2, Vt) <= Circle_Radius)
+        {
+            //MonoBehaviour.print("Line segment A");
+            return true;
+        }
+        if (GetDistanceToLineSegment(v2, v3, Vt) <= Circle_Radius)
+        {
+            //MonoBehaviour.print("Line segment B");
+            return true;
+        }
+        if (GetDistanceToLineSegment(v3, v4, Vt) <= Circle_Radius)
+        {
+            //MonoBehaviour.print("Line segment C");
+            return true;
+        }
+        if (GetDistanceToLineSegment(v4, v1, Vt) <= Circle_Radius)
+        {
+            //MonoBehaviour.print("Line segment D");
+            return true;
+        }
 
         return false;
     }
