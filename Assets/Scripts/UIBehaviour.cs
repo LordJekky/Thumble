@@ -137,6 +137,9 @@ public class UIBehaviour : MonoBehaviour
     string PendingNewPanel;
     string PendingOldPanel;
 
+    Text GoldText;
+    Text EmeraldText;
+
     UIAnimationStates State;
 
 	// Use this for initialization
@@ -158,6 +161,11 @@ public class UIBehaviour : MonoBehaviour
         FinishedFadingObjects = new List<FadingUIObject>();
 
         State = UIAnimationStates.Default;
+
+        GoldText = GameObject.Find("GoldText").GetComponent<Text>();
+
+        GoldText.text = "" + PlayerPrefs.GetInt("Coins");
+        //EmeraldText.text = "" + PlayerPrefs.GetInt("Emeralds");
 	}
 
     //returns the location which this object should slide to or from
@@ -326,6 +334,12 @@ public class UIBehaviour : MonoBehaviour
     public void OpenUIPanel(string PanelName)
     {
         PendingNewPanel = PanelName;
+
+        if (PanelName == "MainMenuPanel")
+        {
+            GoldText.text = "" + PlayerPrefs.GetInt("Coins");
+            //EmeraldText.text = "" + PlayerPrefs.GetInt("Emeralds");
+        }
     }
 
 
