@@ -318,13 +318,25 @@ public class GameBehaviour : MonoBehaviour
                 Renderer = GridTile.AddComponent<SpriteRenderer>();
             }
 
-            
-            Renderer.sprite = Resources.Load<Sprite>("Square");
+            string TileName;
+            if (EvenTile) TileName = "WhiteTile";
+            else TileName = "BlackTile";
+
+            if (Random.Range(1, 100) < 10)
+            {
+                TileName = "Cracked" + TileName;
+
+                if (Random.Range(1, 100) < 50) TileName += "1";
+                else TileName += "2";
+            }
+            else
+            {
+                TileName = "Clean" + TileName;
+            }
+
+            Renderer.sprite = Resources.Load<Sprite>("Tiles/" + TileName);
 
             GridTile.transform.position = new Vector3(FirstTileX + x, TopLine, 0);
-
-            if (EvenTile) Renderer.color = new Color(0.2f, 0.2f, 0.2f);
-            else Renderer.color = new Color(0.8f, 0.8f, 0.8f);
 
             EvenTile = !EvenTile;
 
