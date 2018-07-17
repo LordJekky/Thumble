@@ -152,6 +152,9 @@ public class GameBehaviour : MonoBehaviour
         EnemySprites.Clear();
 
         ThumbSprite.SetActive(false);
+
+        UI.CloseUIPanel("GamePanel");
+        UI.OpenUIPanel("GameOverPanel");
     }
 
     void AddTileRow()
