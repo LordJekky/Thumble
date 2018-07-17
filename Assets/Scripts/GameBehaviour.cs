@@ -45,6 +45,8 @@ public class GameBehaviour : MonoBehaviour
     float TransitionScrollSpeed = 0.5f;
     float ScrollSpeedIncrease = 0.001f;
 
+    float ThumbUpTimer;
+
     int BGTileIndex = 0;
     int FGTileIndex = 0;
     int DemoLinesCleared;
@@ -107,12 +109,15 @@ public class GameBehaviour : MonoBehaviour
         ThumbSprite.SetActive(true);
         ThumbSprite.transform.position = new Vector3(0, FirstTileY + 2, -2);
 
+        ThumbUpTimer = 10;
+
         RowCounter = 0;
 
         CurrentLives = 2;
         MaximumLives = 2;
 
         UI.UpdateHearts(CurrentLives, MaximumLives);
+        UI.UpdateTimer(ThumbUpTimer);
 
         CurrentScrollSpeed = TransitionScrollSpeed;
         State = GameStates.DemoEnding;
@@ -236,7 +241,7 @@ public class GameBehaviour : MonoBehaviour
     }
 
 	// Update is called once per frame
-	void Update () 
+	void Update ()        
     {
         switch (State)
         {
@@ -289,6 +294,13 @@ public class GameBehaviour : MonoBehaviour
 
                     if (CurrentLives == 0) EndGame();
 
+                    if (ThumbUpTimer < 3)
+                    {
+                        ThumbUpTimer += Time.deltaTime;
+                        if (ThumbUpTimer > 3) ThumbUpTimer = 3;
+                        UI.UpdateTimer(ThumbUpTimer);
+                    }
+
                     break;
                 }
             case GameStates.ThumbLifted:
@@ -296,6 +308,11 @@ public class GameBehaviour : MonoBehaviour
                     UpdateScrolling();
                     AddEnemies();
                     UpdateEnemies();
+
+                    ThumbUpTimer -= Time.deltaTime;
+                    if (ThumbUpTimer <= 0) EndGame();
+
+                    UI.UpdateTimer(ThumbUpTimer);
 
                     CheckForThumbDown();
                     break;

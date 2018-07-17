@@ -140,6 +140,9 @@ public class UIBehaviour : MonoBehaviour
     Text GoldText;
     Text EmeraldText;
 
+    GameObject TimerFG;
+    GameObject TimerText;
+
     UIAnimationStates State;
 
     List<GameObject> HeartObjects;
@@ -148,6 +151,9 @@ public class UIBehaviour : MonoBehaviour
 	void Start () 
     {
         UIPanels = new Dictionary<string, GameObject>();
+
+        TimerFG = GameObject.Find("TimerFG");
+        TimerText = GameObject.Find("TimerText");
 
         foreach (GameObject UIPanel in GameObject.FindGameObjectsWithTag("UIPanel"))
         {
@@ -407,5 +413,35 @@ public class UIBehaviour : MonoBehaviour
         {
             HeartObjects[i].GetComponent<Image>().sprite = Resources.Load<Sprite>("UI/heart_2");
         }
+    }
+
+    public void UpdateTimer(float TimeLeft)
+    {
+        TimerText.GetComponent<Text>().text = string.Format("{0:0.0}", TimeLeft);
+
+        float Pct = TimeLeft / 10f;
+
+        RectTransform Transform = TimerFG.transform as RectTransform;
+        Transform.sizeDelta = new Vector2(702f * Pct, Transform.sizeDelta.y);
+
+        Color c = new Color(0, 0, 0, 1);
+
+        if (Pct >= 0.5f)
+        {
+            Pct -= 0.5f;
+            Pct *= 2;
+
+            c.g = 1;
+            c.r = 1 - Pct;
+        }
+        else
+        {
+            Pct *= 2;
+
+            c.r = 1;
+            c.g = Pct;
+        }
+
+        TimerFG.GetComponent<Image>().color = c;
     }
 }
