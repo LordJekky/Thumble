@@ -142,6 +142,8 @@ public class UIBehaviour : MonoBehaviour
 
     UIAnimationStates State;
 
+    List<GameObject> HeartObjects;
+
 	// Use this for initialization
 	void Start () 
     {
@@ -166,6 +168,8 @@ public class UIBehaviour : MonoBehaviour
 
         GoldText.text = "" + PlayerPrefs.GetInt("Coins");
         //EmeraldText.text = "" + PlayerPrefs.GetInt("Emeralds");
+
+        HeartObjects = new List<GameObject>();
 	}
 
     //returns the location which this object should slide to or from
@@ -351,5 +355,57 @@ public class UIBehaviour : MonoBehaviour
     public void OpenTwitter()
     {
         Application.OpenURL("http://illustrious-software.com/thumble_twitter.php");
+    }
+
+    public void ClearHearts()
+    {
+        foreach (GameObject O in HeartObjects) GameObject.Destroy(O);
+        HeartObjects.Clear();
+    }
+
+    private void AddHeart()
+    {
+        GameObject GameCanvas = UIPanels["GamePanel"];
+
+        GameObject O = new GameObject();
+
+        O.AddComponent<CanvasRenderer>();
+        RectTransform Transform = O.AddComponent<RectTransform>();
+        O.AddComponent<Image>();
+
+        O.transform.position = new Vector3(0, 0, 0);
+        O.transform.SetParent(GameCanvas.transform);
+
+        Transform.anchorMin = new Vector2(0, 1);
+        Transform.anchorMax = new Vector2(0, 1);
+        Transform.pivot = new Vector2(0f, 0f);
+        Transform.sizeDelta = new Vector2(100, 100);
+        Transform.anchoredPosition = new Vector2(10 + (HeartObjects.Count * 110), -110);
+
+        HeartObjects.Add(O);
+    }
+
+    private void RemoveHeart()
+    {
+        GameObject.Destroy(HeartObjects[HeartObjects.Count-1]);
+        HeartObjects.RemoveAt(HeartObjects.Count - 1);
+    }
+
+    public void UpdateHearts(int CurrentLives, int MaximumLives)
+    {
+        //first make sure that we have the right number of heart displays
+        while (HeartObjects.Count < MaximumLives) AddHeart();
+        while (HeartObjects.Count > MaximumLives) RemoveHeart();
+
+        //check to make sure each heart has the right image on it (normal or broken)
+        for (int i = 0; i < CurrentLives; i++)
+        {
+            HeartObjects[i].GetComponent<Image>().sprite = Resources.Load<Sprite>("UI/heart_0");
+        }
+
+        for (int i = CurrentLives; i < MaximumLives; i++)
+        {
+            HeartObjects[i].GetComponent<Image>().sprite = Resources.Load<Sprite>("UI/heart_2");
+        }
     }
 }
