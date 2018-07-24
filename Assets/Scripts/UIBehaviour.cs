@@ -30,7 +30,7 @@ class FadingUIObject
         ImgComp = UIObject.GetComponent<Image>();
         OriginalColour = ImgComp.color;
 
-        MonoBehaviour.print(OriginalColour);
+        //MonoBehaviour.print(OriginalColour);
 
         if (FadeIn)
         {

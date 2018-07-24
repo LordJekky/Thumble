@@ -13,6 +13,26 @@ enum GameStates
     ThumbLifted
 }
 
+enum TileStates
+{
+    Unset,          //default value, not yet determined
+    Gap,            //this tile has no obstacle
+    Block,          //this tile has an obstacle
+    PathGap         //this tile has no obstacle - and is part of the guaranteed open path
+}
+
+class RowObstacleData
+{
+    public TileStates[] States;
+    public bool HasObstacles;
+
+    public RowObstacleData()
+    {
+        States = new TileStates[6];
+        HasObstacles = false;
+    }
+}
+
 public class GameBehaviour : MonoBehaviour 
 {
     public GameObject ThumbSprite;
@@ -41,9 +61,33 @@ public class GameBehaviour : MonoBehaviour
     float CurrentScrollSpeed;
     float DemoScrollSpeed = 0.025f;
     float MinScrollSpeed = 0.01f;
-    float MaxScrollSpeed = 0.1f;
-    float TransitionScrollSpeed = 0.5f;
-    float ScrollSpeedIncrease = 0.001f;
+    float MaxScrollSpeed = 0.20f;
+    float TransitionScrollSpeed = 0.75f;
+
+    //how much faster should the game scroll for each line that passes
+    float ScrollSpeedIncrease = 0.0005f;
+
+    //how many blocks in a row should be obstacles
+    int MinObstacleCountH;
+    int MaxObstacleCountH;
+
+    //how much horizontal space should there be between obstacles
+    int MinObstacleGapH;
+
+    //how many blocks tall should obstavles be (how many lines in a row can have obstacles)
+    int MinObstacleSizeV;
+    int MaxObstacleSizeV;
+
+    //how many lines should be left clear between 
+    int MinObstacleGapV;
+    int MaxObstacleGapV;
+
+    bool CreatingObstacle;
+    int LinesToGo;
+
+    //rotating list, used to track what is on each row - used for density checks
+    //and to ensure that gaps are left for the player
+    List<RowObstacleData> Rows;
 
     float ThumbUpTimer;
 
@@ -56,6 +100,8 @@ public class GameBehaviour : MonoBehaviour
 
     bool EvenRow;
     int RowCounter;
+
+    int Difficulty;
 
     Random RNG;
 
@@ -99,6 +145,8 @@ public class GameBehaviour : MonoBehaviour
         TopTileY = Mathf.Ceil(TilesY / 2);
         TopTileY++;
 
+        Rows = new List<RowObstacleData>();
+
         TopLine = FirstTileY;
         while (TopLine < TopTileY) AddTileRow();
         State = GameStates.DemoRunning;
@@ -113,14 +161,170 @@ public class GameBehaviour : MonoBehaviour
 
         RowCounter = 0;
 
+        Rows = new List<RowObstacleData>();
+        Rows.Add(new RowObstacleData());
+
         CurrentLives = 2;
         MaximumLives = 2;
 
         UI.UpdateHearts(CurrentLives, MaximumLives);
         UI.UpdateTimer(ThumbUpTimer);
 
+        Difficulty = 0;
+        IncreaseDifficulty();
+
+        CreatingObstacle = false;
+        LinesToGo = Random.Range(MinObstacleGapV, MaxObstacleGapV+1);
+
         CurrentScrollSpeed = TransitionScrollSpeed;
         State = GameStates.DemoEnding;
+    }
+
+    private void IncreaseDifficulty()
+    {
+        Difficulty++;
+        if (Difficulty > 7) Difficulty = 7;
+
+        switch (Difficulty)
+        {
+            case 1:
+                {
+                    MinObstacleCountH = 2;
+                    MaxObstacleCountH = 2;
+
+                    MinObstacleGapH = 4;
+
+                    MinObstacleSizeV = 1;
+                    MaxObstacleSizeV = 2;
+
+                    MinObstacleGapV = 2;
+                    MaxObstacleGapV = 8;
+
+                    break;
+                }
+            case 2:
+                {
+                    MinObstacleCountH = 2;
+                    MaxObstacleCountH = 3;
+
+                    MinObstacleGapH = 3;
+
+                    MinObstacleSizeV = 1;
+                    MaxObstacleSizeV = 2;
+
+                    MinObstacleGapV = 2;
+                    MaxObstacleGapV = 8;
+
+                    break;
+                }
+            case 3:
+                {
+                    MinObstacleCountH = 2;
+                    MaxObstacleCountH = 3;
+
+                    MinObstacleGapH = 3;
+
+                    MinObstacleSizeV = 2;
+                    MaxObstacleSizeV = 3;
+
+                    MinObstacleGapV = 2;
+                    MaxObstacleGapV = 6;
+
+                    break;
+                }
+            case 4:
+                {
+                    MinObstacleCountH = 2;
+                    MaxObstacleCountH = 3;
+
+                    MinObstacleGapH = 3;
+
+                    MinObstacleSizeV = 2;
+                    MaxObstacleSizeV = 4;
+
+                    MinObstacleGapV = 2;
+                    MaxObstacleGapV = 4;
+
+                    break;
+                }
+            case 5:
+                {
+                    MinObstacleCountH = 2;
+                    MaxObstacleCountH = 4;
+
+                    MinObstacleGapH = 2;
+
+                    MinObstacleSizeV = 2;
+                    MaxObstacleSizeV = 4;
+
+                    MinObstacleGapV = 2;
+                    MaxObstacleGapV = 4;
+
+                    break;
+                }
+            case 6:
+                {
+                    MinObstacleCountH = 2;
+                    MaxObstacleCountH = 4;
+
+                    MinObstacleGapH = 2;
+
+                    MinObstacleSizeV = 2;
+                    MaxObstacleSizeV = 5;
+
+                    MinObstacleGapV = 1;
+                    MaxObstacleGapV = 3;
+
+                    break;
+                }
+            case 7:
+                {
+                    MinObstacleCountH = 2;
+                    MaxObstacleCountH = 4;
+
+                    MinObstacleGapH = 2;
+
+                    MinObstacleSizeV = 3;
+                    MaxObstacleSizeV = 6;
+
+                    MinObstacleGapV = 1;
+                    MaxObstacleGapV = 2;
+
+                    break;
+                }
+            case 8:
+                {
+                    MinObstacleCountH = 2;
+                    MaxObstacleCountH = 5;
+
+                    MinObstacleGapH = 1;
+
+                    MinObstacleSizeV = 3;
+                    MaxObstacleSizeV = 6;
+
+                    MinObstacleGapV = 1;
+                    MaxObstacleGapV = 2;
+
+                    break;
+                }
+            case 9:
+                {
+                    MinObstacleCountH = 3;
+                    MaxObstacleCountH = 5;
+
+                    MinObstacleGapH = 1;
+
+                    MinObstacleSizeV = 4;
+                    MaxObstacleSizeV = 6;
+
+                    MinObstacleGapV = 1;
+                    MaxObstacleGapV = 2;
+
+                    break;
+                }
+        }
+
+        
     }
 
     private void GenerateHitMap()
@@ -209,10 +413,121 @@ public class GameBehaviour : MonoBehaviour
             BGTiles.Add(GridTile);
         }
 
-        //add the foreground tiles
+        if (RowCounter > 6)
+        {
+            if (RowCounter % 60 == 0) IncreaseDifficulty();
+
+            if (CreatingObstacle)
+            {
+                CreateObstacleRow();
+
+                LinesToGo--;
+                if (LinesToGo == 0)
+                {
+                    CreatingObstacle = false;
+                    LinesToGo = Random.Range(MinObstacleGapV, MaxObstacleGapV + 1);
+                    print("" + LinesToGo);
+                }
+            }
+            else
+            {
+                RowObstacleData Data = new RowObstacleData();
+                Rows.Insert(0, Data);
+                if (Rows.Count > 5) Rows.RemoveAt(Rows.Count - 1);
+
+                LinesToGo--;
+                if (LinesToGo == 0)
+                {
+                    CreatingObstacle = true;
+                    LinesToGo = Random.Range(MinObstacleSizeV, MaxObstacleSizeV + 1);
+                }
+            }
+        }
+
+        
+        
+        DemoLinesCleared++;
+        RowCounter++;
+        TopLine++;
+
+        if (State == GameStates.ThumbActive || State == GameStates.ThumbLifted)
+        {
+            CurrentScrollSpeed += ScrollSpeedIncrease;
+            if (CurrentScrollSpeed > MaxScrollSpeed) CurrentScrollSpeed = MaxScrollSpeed;
+        }
+    }
+
+    private void CreateObstacleRow()
+    {
+        TileStates[] RowLayout = new TileStates[TilesX];
+
+        RowObstacleData Data = new RowObstacleData();
+        Data.HasObstacles = true;
+
+        RowObstacleData PrevData = Rows[0];
+
+        int ObstacleCount = 0;
+        int ObstacleTarget = Random.Range(MinObstacleCountH, MaxObstacleCountH);
+
+        //at least one gap has to line up with the row below this one
+        List<int> GapIndices = new List<int>();
+        for (int i = 0; i < TilesX; i++)
+        {
+            if (PrevData.HasObstacles == false || PrevData.States[i] == TileStates.PathGap) GapIndices.Add(i);
+        }
+
+        int StartIndex = GapIndices[Random.Range(0, GapIndices.Count)];
+        int EndIndex = StartIndex;
+
+        RowLayout[StartIndex] = TileStates.PathGap;
+
+        //the gap should be forced to the min gap width, randomly add gap tiles left and right
+        int GapWidth = 1;
+        while (GapWidth < MinObstacleGapH)
+        {
+            int Dir = Random.Range(0, 2);
+
+            if (Dir == 0)
+            {
+                if (StartIndex == 0) continue;
+                
+                StartIndex--;
+
+                RowLayout[StartIndex] = TileStates.PathGap;
+                GapWidth++;
+            }
+            else
+            {
+                if (EndIndex == TilesX-1) continue;
+
+                EndIndex++;
+
+                RowLayout[EndIndex] = TileStates.PathGap;
+                GapWidth++;
+            }
+        }
+
+        for (int i = 0; i < TilesX; i++)
+        {
+            if (RowLayout[i] == TileStates.Unset) RowLayout[i] = TileStates.Gap;
+        }
+
+        //add obstacles at random until the obstacle count is met
+        while (ObstacleCount < ObstacleTarget)
+        {
+            int a = Random.Range(0, TilesX);
+            if (RowLayout[a] == TileStates.Gap)
+            {
+                RowLayout[a] = TileStates.Block;
+                ObstacleCount++;
+            }
+        }
+
         for (int x = 0; x < TilesX; x++)
         {
-            if (Random.Range(1, 100) < 75 || RowCounter < 6) continue;
+            Data.States[x] = RowLayout[x];
+
+            if (RowLayout[x] != TileStates.Block) continue;
 
             GameObject GridTile;
             SpriteRenderer Renderer;
@@ -232,12 +547,14 @@ public class GameBehaviour : MonoBehaviour
 
             GridTile.transform.position = new Vector3(FirstTileX + x, TopLine, -1);
 
+            //if (RowLayout[x] == TileStates.PathGap) Renderer.color = new Color(0, 1, 0, 0.5f);
+            //else Renderer.color = new Color(1, 1, 1, 1);
+
             FGTiles.Add(GridTile);
         }
 
-        DemoLinesCleared++;
-        RowCounter++;
-        TopLine++;
+        Rows.Insert(0, Data);
+        if (Rows.Count > 5) Rows.RemoveAt(Rows.Count - 1);
     }
 
 	// Update is called once per frame
@@ -336,7 +653,7 @@ public class GameBehaviour : MonoBehaviour
 
     private void AddEnemies()
     {
-        if (EnemySprites.Count > 4) return;
+        if (EnemySprites.Count > 1) return;
         if (Random.Range(1, 100) != 25) return;
 
         EnemySprites.Add(new EnemyData(FieldWidthTiles, FieldHeightTiles));

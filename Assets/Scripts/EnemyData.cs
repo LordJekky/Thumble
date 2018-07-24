@@ -33,7 +33,7 @@ public class EnemyData
     SpriteRenderer Renderer;
 
     Vector2 Direction;
-    float MoveSpeed = 0.075f;
+    float MoveSpeed = 0.15f;
     float RotateSpeed = 2f;
 
     float SpriteWidth, SpriteHeight;
