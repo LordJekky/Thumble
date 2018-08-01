@@ -85,6 +85,8 @@ public class GameBehaviour : MonoBehaviour
     bool CreatingObstacle;
     int LinesToGo;
 
+    int Score;
+
     //rotating list, used to track what is on each row - used for density checks
     //and to ensure that gaps are left for the player
     List<RowObstacleData> Rows;
@@ -178,6 +180,8 @@ public class GameBehaviour : MonoBehaviour
 
         CurrentScrollSpeed = TransitionScrollSpeed;
         State = GameStates.DemoEnding;
+
+        Score = 0;
     }
 
     private void IncreaseDifficulty()
@@ -368,6 +372,8 @@ public class GameBehaviour : MonoBehaviour
 
     void AddTileRow()
     {
+        if (State == GameStates.ThumbActive || State == GameStates.ThumbLifted) Score++;
+
         bool EvenTile = EvenRow;
         EvenRow = !EvenRow;
 
