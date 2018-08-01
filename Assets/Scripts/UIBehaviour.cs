@@ -155,11 +155,16 @@ public class UIBehaviour : MonoBehaviour
         TimerFG = GameObject.Find("TimerFG");
         TimerText = GameObject.Find("TimerText");
 
-        foreach (GameObject UIPanel in GameObject.FindGameObjectsWithTag("UIPanel"))
+        Transform Canvas = GameObject.Find("UICanvas").GetComponent<Transform>();
+        for (int i = 0; i < Canvas.childCount; i++)
         {
+            Transform T = Canvas.GetChild(i);
+            GameObject UIPanel = T.gameObject;
+
             UIPanels.Add(UIPanel.name, UIPanel);
 
-            if (UIPanel.name != "MainMenuPanel") UIPanel.SetActive(false);
+            if (UIPanel.name == "MainMenuPanel") UIPanel.SetActive(true);
+            else UIPanel.SetActive(false);
         }
 
         MovingObjects = new List<MovingUIObject>();
