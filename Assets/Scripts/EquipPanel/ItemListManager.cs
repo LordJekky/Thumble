@@ -25,6 +25,10 @@ public class ItemListManager : MonoBehaviour {
             itemsArray[c].name = items[c].itemName;
             itemsArray[c].GetComponent<Image>().sprite = items[c].itemImage;
 
+            Item actualItem = items[c];
+            itemsArray[c].GetComponent<Button>().onClick.AddListener(delegate { EquipPanel.GetComponent<InventaryController>().EquipSelectedItemHolder(actualItem); });
+            itemsArray[c].GetComponent<Button>().onClick.AddListener(delegate { EquipPanel.GetComponent<InventaryController>().DisposeItemList(); });
+            /*
             EventTrigger trigger = itemsArray[c].GetComponent<EventTrigger>();
 
             EventTrigger.Entry entry = new EventTrigger.Entry();
@@ -34,12 +38,12 @@ public class ItemListManager : MonoBehaviour {
             entry.callback.AddListener((eventData) => { EquipPanel.GetComponent<InventaryController>().EquipSelectedItemHolder(actualItem); });
             entry.callback.AddListener((eventData) => { EquipPanel.GetComponent<InventaryController>().DisposeItemList(); });
 
-            trigger.triggers.Add(entry);
+            trigger.triggers.Add(entry);*/
         }
-    }//GameObject.Find("EquipPanel").GetComponent<InventaryController>().EquipItemHolder(items[c]); 
-	
-	// Update is called once per frame
-	void Update () {
+    }
+
+    // Update is called once per frame
+    void Update () {
 		
 	}
 }
