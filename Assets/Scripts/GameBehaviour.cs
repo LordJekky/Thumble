@@ -10,7 +10,8 @@ enum GameStates
     DemoEnding,
     WaitingForThumb,
     ThumbActive,
-    ThumbLifted
+    ThumbLifted,
+    Paused
 }
 
 enum TileStates
@@ -38,6 +39,7 @@ public class GameBehaviour : MonoBehaviour
     public GameObject ThumbSprite;
 
     GameStates State = GameStates.NotRunning;
+    GameStates PrePausedState;
 
     float FieldWidthTiles = 6;
     float FieldHeightTiles;
@@ -60,7 +62,7 @@ public class GameBehaviour : MonoBehaviour
 
     float CurrentScrollSpeed;
     float DemoScrollSpeed = 0.025f;
-    float MinScrollSpeed = 0.01f;
+    float MinScrollSpeed = 0.05f;
     float MaxScrollSpeed = 0.20f;
     float TransitionScrollSpeed = 0.75f;
 
@@ -367,6 +369,7 @@ public class GameBehaviour : MonoBehaviour
         ThumbSprite.SetActive(false);
 
         UI.CloseUIPanel("GamePanel");
+        UI.CloseUIPanel("GameSettingsPanel");
         UI.OpenUIPanel("GameOverPanel");
     }
 
@@ -563,12 +566,24 @@ public class GameBehaviour : MonoBehaviour
         if (Rows.Count > 5) Rows.RemoveAt(Rows.Count - 1);
     }
 
+    public void PauseGame()
+    {
+        PrePausedState = State;
+        State = GameStates.Paused;
+    }
+
+    public void ResumeGame()
+    {
+        State = PrePausedState;
+    }
+
 	// Update is called once per frame
 	void Update ()        
     {
         switch (State)
         {
             case GameStates.NotRunning: return;
+            case GameStates.Paused: return;
             case GameStates.DemoStarting:
                 {
                     //whatever is there is cleared to the bottom rapidly
@@ -605,11 +620,15 @@ public class GameBehaviour : MonoBehaviour
                 }
             case GameStates.WaitingForThumb:
                 {
+                    if (UI.AnimatingPanel()) return;
+
                     CheckForThumbDown();
                     break;
                 }
             case GameStates.ThumbActive:
                 {
+                    if (UI.AnimatingPanel()) return;
+
                     UpdateScrolling();
                     CheckForCollision();
                     AddEnemies();
@@ -628,6 +647,8 @@ public class GameBehaviour : MonoBehaviour
                 }
             case GameStates.ThumbLifted:
                 {
+                    if (UI.AnimatingPanel()) return;
+
                     UpdateScrolling();
                     AddEnemies();
                     UpdateEnemies();

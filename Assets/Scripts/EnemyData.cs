@@ -41,6 +41,7 @@ public class EnemyData
     public bool Disposed;
 
     static int EnemyIndex = 0;
+    static bool Left;
 
     float TilesX, TilesY;
 
@@ -48,9 +49,6 @@ public class EnemyData
     {
         this.TilesX = TilesX;
         this.TilesY = TilesY;
-
-        bool Left = true;
-        if (Random.Range(1, 100) < 50) Left = false;
 
         float Xpos = 0;
         if (Left) Xpos = (TilesX / 2f) + 1f;
@@ -78,6 +76,8 @@ public class EnemyData
             Direction = new Vector2(0.5f, -0.5f);
             RotateSpeed *= -1;
         }
+
+        Left = !Left;
     }
 
     float sign(Point2D p1, Point2D p2, Point2D p3)

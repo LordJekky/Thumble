@@ -152,9 +152,6 @@ public class UIBehaviour : MonoBehaviour
     {
         UIPanels = new Dictionary<string, GameObject>();
 
-        TimerFG = GameObject.Find("TimerFG");
-        TimerText = GameObject.Find("TimerText");
-
         Transform Canvas = GameObject.Find("UICanvas").GetComponent<Transform>();
         for (int i = 0; i < Canvas.childCount; i++)
         {
@@ -167,6 +164,14 @@ public class UIBehaviour : MonoBehaviour
             else UIPanel.SetActive(false);
         }
 
+        GoldText = GameObject.Find("GoldText").GetComponent<Text>();
+
+        //this panel is disabled, so a little extra work is needed
+
+
+        TimerFG = GetNamedObject(UIPanels["GamePanel"], "TimerFG");
+        TimerText = GetNamedObject(UIPanels["GamePanel"], "TimerText");
+
         MovingObjects = new List<MovingUIObject>();
         FinishedObjects = new List<MovingUIObject>();
 
@@ -175,13 +180,25 @@ public class UIBehaviour : MonoBehaviour
 
         State = UIAnimationStates.Default;
 
-        GoldText = GameObject.Find("GoldText").GetComponent<Text>();
-
         GoldText.text = "" + PlayerPrefs.GetInt("Coins");
         //EmeraldText.text = "" + PlayerPrefs.GetInt("Emeralds");
 
         HeartObjects = new List<GameObject>();
 	}
+
+    public GameObject GetNamedObject(GameObject Parent, string Name)
+    {
+        for (int i = 0; i < Parent.transform.childCount; i++)
+        {
+            Transform T = Parent.transform.GetChild(i);
+            if (T.gameObject.name == Name) return T.gameObject;
+
+            GameObject Result = GetNamedObject(T.gameObject, Name);
+            if (Result != null) return Result;
+        }
+
+        return null;
+    }
 
     //returns the location which this object should slide to or from
     //when animating screen transitions
@@ -278,7 +295,7 @@ public class UIBehaviour : MonoBehaviour
                                 Vector2 Target = new Vector2(ChildObject.transform.localPosition.x, ChildObject.transform.localPosition.y);
 
                                 ChildObject.transform.localPosition = new Vector3(NewPos.x, NewPos.y, 0);
-                                MovingObjects.Add(new MovingUIObject(ChildObject, Target, 30f));
+                                MovingObjects.Add(new MovingUIObject(ChildObject, Target, 20f));
                             }
                         }
 
@@ -321,13 +338,20 @@ public class UIBehaviour : MonoBehaviour
         }
 	}
 
+    public bool AnimatingPanel()
+    {
+        return State != UIAnimationStates.Default;
+    }
+
     public void CloseUIPanel(string PanelName)
     {
-        PendingOldPanel = PanelName;
+        GameObject Panel = UIPanels[PanelName];
+        if (Panel.activeInHierarchy == false) return;
 
+        PendingOldPanel = PanelName;
         MovingObjects.Clear();
 
-        GameObject Panel = UIPanels[PanelName];
+        
         foreach (Transform child in Panel.transform)
         {
             GameObject ChildObject = child.gameObject;
@@ -339,7 +363,7 @@ public class UIBehaviour : MonoBehaviour
             else
             {
                 Vector2 Target = GetObjectSlideTarget(ChildObject);
-                MovingObjects.Add(new MovingUIObject(ChildObject, Target, 30f));
+                MovingObjects.Add(new MovingUIObject(ChildObject, Target, 20f));
             }
         }
 
@@ -387,11 +411,11 @@ public class UIBehaviour : MonoBehaviour
         O.transform.position = new Vector3(0, 0, 0);
         O.transform.SetParent(GameCanvas.transform);
 
-        Transform.anchorMin = new Vector2(0, 1);
-        Transform.anchorMax = new Vector2(0, 1);
-        Transform.pivot = new Vector2(0f, 0f);
+        Transform.anchorMin = new Vector2(1, 1);
+        Transform.anchorMax = new Vector2(1, 1);
+        Transform.pivot = new Vector2(1f, 0f);
         Transform.sizeDelta = new Vector2(100, 100);
-        Transform.anchoredPosition = new Vector2(10 + (HeartObjects.Count * 110), -110);
+        Transform.anchoredPosition = new Vector2(-10 + (HeartObjects.Count * -110), -110);
 
         HeartObjects.Add(O);
     }
