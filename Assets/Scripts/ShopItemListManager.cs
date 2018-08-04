@@ -9,7 +9,7 @@ public class ShopItemListManager : MonoBehaviour {
     public GameObject content;
     public GameObject shopItemPortraitPrefab;
     [Space]
-    public List<Item> items;
+    public List<Item> shopItems, shopEmeralds, shopCoins;
 
     GameObject[] itemsArray;
 
@@ -17,14 +17,14 @@ public class ShopItemListManager : MonoBehaviour {
     void Start()
     {
         //fill the gameobject array
-        itemsArray = new GameObject[items.Count];
+        itemsArray = new GameObject[shopItems.Count];
 
         for (int c = 0; c < itemsArray.Length; c++)
         {
             itemsArray[c] = Instantiate(shopItemPortraitPrefab, content.transform);
 
-            itemsArray[c].name = items[c].itemName;
-            itemsArray[c].GetComponent<Image>().sprite = items[c].itemImage;
+            itemsArray[c].name = shopItems[c].itemName;
+            itemsArray[c].GetComponent<Image>().sprite = shopItems[c].itemImage;
 
             itemsArray[c].GetComponent<Button>().onClick.AddListener(test);
         }
@@ -38,6 +38,76 @@ public class ShopItemListManager : MonoBehaviour {
     public void test(Item item)
     {
         Debug.Log("I am the best programmer in the world");
+    }
+
+    public void fillItemShop()
+    {
+        int x = 0;
+        do
+        {
+            Destroy(itemsArray[x]);
+            x++;
+        } while (x < itemsArray.Length);
+        
+
+        //fill the gameobject array
+        itemsArray = new GameObject[shopItems.Count];
+
+        for (int c = 0; c < itemsArray.Length; c++)
+        {
+            itemsArray[c] = Instantiate(shopItemPortraitPrefab, content.transform);
+
+            itemsArray[c].name = shopItems[c].itemName;
+            itemsArray[c].GetComponent<Image>().sprite = shopItems[c].itemImage;
+
+            itemsArray[c].GetComponent<Button>().onClick.AddListener(test);
+        }
+    }
+
+    public void fillEmeraldShop()
+    {
+        int x = 0;
+        do
+        {
+            Destroy(itemsArray[x]);
+            x++;
+        } while (x < itemsArray.Length);
+
+        //fill the gameobject array
+        itemsArray = new GameObject[shopEmeralds.Count];
+
+        for (int c = 0; c < itemsArray.Length; c++)
+        {
+            itemsArray[c] = Instantiate(shopItemPortraitPrefab, content.transform);
+
+            itemsArray[c].name = shopEmeralds[c].itemName;
+            itemsArray[c].GetComponent<Image>().sprite = shopEmeralds[c].itemImage;
+
+            itemsArray[c].GetComponent<Button>().onClick.AddListener(test);
+        }
+    }
+
+    public void fillCoinShop()
+    {
+        int x = 0;
+        do
+        {
+            Destroy(itemsArray[x]);
+            x++;
+        } while (x < itemsArray.Length);
+
+        //fill the gameobject array
+        itemsArray = new GameObject[shopCoins.Count];
+
+        for (int c = 0; c < itemsArray.Length; c++)
+        {
+            itemsArray[c] = Instantiate(shopItemPortraitPrefab, content.transform);
+
+            itemsArray[c].name = shopCoins[c].itemName;
+            itemsArray[c].GetComponent<Image>().sprite = shopCoins[c].itemImage;
+
+            itemsArray[c].GetComponent<Button>().onClick.AddListener(test);
+        }
     }
 
     // Update is called once per frame
