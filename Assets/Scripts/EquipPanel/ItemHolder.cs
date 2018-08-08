@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class ItemHolder : MonoBehaviour {
 
-    public Item item;
+    Item item;
 
 	// Use this for initialization
 	void Start () {
@@ -24,8 +24,7 @@ public class ItemHolder : MonoBehaviour {
         }
 	}
 
-    public void EquipItem(Item item)
-    {
-        this.item = item;
-    }
+    public void SetItem(Item item) { this.item = item; }
+
+    public Item GetItem() { return item; }
 }

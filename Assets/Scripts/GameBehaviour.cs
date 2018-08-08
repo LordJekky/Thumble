@@ -9,6 +9,7 @@ enum GameStates
     DemoRunning,
     DemoEnding,
     WaitingForThumb,
+    CountDown,
     ThumbActive,
     ThumbLifted,
     Paused
@@ -111,6 +112,10 @@ public class GameBehaviour : MonoBehaviour
 
     UIBehaviour UI;
 
+    public GameObject TextCountDown;
+    Animator TextCountDownAnimator;
+    int CountDownValue = 4;
+
 	// Use this for initialization
 	void Start () 
     {
@@ -122,6 +127,9 @@ public class GameBehaviour : MonoBehaviour
         ThumbSprite.SetActive(false);
 
         UI = GameObject.Find("UICanvas").GetComponent<UIBehaviour>();
+
+        //TextCountDown = GameObject.Find("TextCountDown"); // CountDown
+        TextCountDownAnimator = TextCountDown.GetComponent<Animator>();
 
         float Aspect = (float)Screen.height / (float)Screen.width;
         FieldHeightTiles = Aspect * FieldWidthTiles;
@@ -625,6 +633,12 @@ public class GameBehaviour : MonoBehaviour
                     CheckForThumbDown();
                     break;
                 }
+            case GameStates.CountDown:
+                {
+                    CheckCountDown();
+
+                    break;
+                }
             case GameStates.ThumbActive:
                 {
                     if (UI.AnimatingPanel()) return;
@@ -663,6 +677,77 @@ public class GameBehaviour : MonoBehaviour
                 }
         }
 	}
+
+    public void CheckCountDown()
+    {
+        if (Application.isMobilePlatform)//is an Android
+        {
+            if (Input.touchCount == 1)
+            {
+                if (!TextCountDown.activeInHierarchy) TextCountDown.SetActive(true);
+
+                if (!TextCountDownAnimator.GetCurrentAnimatorStateInfo(0).IsName("NumberFades"))
+                {
+                    //se l'animazione non sta venendo eseguita, eseguila ed avanza nel conto alla rovescia
+                    CountDownValue--;
+                    
+                    if (CountDownValue == 0)
+                    {
+                        TextCountDown.SetActive(false);
+                        CountDownValue = 4;
+                        State = GameStates.ThumbActive;
+                        return;
+                    }
+
+                    TextCountDown.GetComponent<UnityEngine.UI.Text>().text = "" + CountDownValue;
+                    TextCountDownAnimator.Play("NumberFades", 0);
+                }
+            }
+            else
+            if (Input.touchCount == 0)
+            {
+                TextCountDown.SetActive(false);
+
+                State = GameStates.WaitingForThumb;
+                CountDownValue = 4;
+            }
+
+
+        }
+        else//is a PC
+        {
+            if (Input.GetMouseButton(0))
+            {
+                if (!TextCountDown.activeInHierarchy) TextCountDown.SetActive(true);
+
+                if (!TextCountDownAnimator.GetCurrentAnimatorStateInfo(0).IsName("NumberFades"))
+                {
+                    //se l'animazione non sta venendo eseguita, eseguila ed avanza nel conto alla rovescia
+                    CountDownValue--;
+
+                    if (CountDownValue == 0)
+                    {
+                        TextCountDown.SetActive(false);
+                        CountDownValue = 4;
+                        State = GameStates.ThumbActive;
+                        return;
+                    }
+
+                    TextCountDown.GetComponent<UnityEngine.UI.Text>().text = "" + CountDownValue;
+                    TextCountDownAnimator.Play("NumberFades", 0);
+                }
+            }
+            else
+            {
+                TextCountDown.SetActive(false);
+
+                State = GameStates.WaitingForThumb;
+                CountDownValue = 4;
+            }
+
+
+        }
+    }
 
     private void UpdateEnemies()
     {
@@ -807,7 +892,7 @@ public class GameBehaviour : MonoBehaviour
 
                 if (Distance < 1)
                 {
-                    State = GameStates.ThumbActive;
+                    State = GameStates.CountDown;
                     ThumbSprite.transform.position = new Vector3(mousePosition.x, mousePosition.y, -2);
                 }
             }
@@ -826,7 +911,7 @@ public class GameBehaviour : MonoBehaviour
 
                 if (Distance < 1)
                 {
-                    State = GameStates.ThumbActive;
+                    State = GameStates.CountDown;
                     ThumbSprite.transform.position = new Vector3(mousePosition.x, mousePosition.y, -2);
                 }
             }

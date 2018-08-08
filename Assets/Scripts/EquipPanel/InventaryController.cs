@@ -65,7 +65,7 @@ public class InventaryController : MonoBehaviour
         }
 
 
-        itemHolderSelected.GetComponent<ItemHolder>().EquipItem(item);
+        itemHolderSelected.GetComponent<ItemHolder>().SetItem(item);
     }
 
 
