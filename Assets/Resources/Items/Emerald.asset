@@ -9,7 +9,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a4dd13cffdf9ed94281317ac6493b722, type: 3}
-  m_Name: Gold
+  m_Name: Emerald
   m_EditorClassIdentifier: 
-  itemName: Gold
-  itemImage: {fileID: 21300000, guid: 98e581c71b6861d4db0b0318737ff875, type: 3}
+  itemName: Emerald
+  itemImage: {fileID: 21300000, guid: 75e40d8f485a49440bdf8b27715b0fa6, type: 3}
+  powerUpType: 3

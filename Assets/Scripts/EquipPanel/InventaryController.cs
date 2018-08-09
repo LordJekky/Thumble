@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class InventaryController : MonoBehaviour
 {
@@ -9,18 +7,6 @@ public class InventaryController : MonoBehaviour
     public GameObject firstItemHolder, secondItemHolder, thirdItemHolder;
     GameObject itemHolderSelected; //the itemHolder i've actually selected
     bool _itemListActived = false;
-
-    // Use this for initialization
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
 
     public void OpenDisposeItemList(GameObject itemHolder)
     {

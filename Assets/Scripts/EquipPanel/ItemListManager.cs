@@ -1,7 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class ItemListManager : MonoBehaviour {
@@ -41,9 +39,4 @@ public class ItemListManager : MonoBehaviour {
             trigger.triggers.Add(entry);*/
         }
     }
-
-    // Update is called once per frame
-    void Update () {
-		
-	}
 }

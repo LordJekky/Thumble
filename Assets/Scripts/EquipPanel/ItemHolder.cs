@@ -1,16 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class ItemHolder : MonoBehaviour {
 
-    Item item;
-
-	// Use this for initialization
-	void Start () {
-		
-	}
+    public Item item;
 	
 	// Update is called once per frame
 	void Update () {
