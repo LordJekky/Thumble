@@ -1,8 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
 
 public class ShopItemListManager : MonoBehaviour {
 
@@ -13,6 +11,9 @@ public class ShopItemListManager : MonoBehaviour {
 
     GameObject[] itemsArray;
 
+    GameObject buttonSelected = null;
+    Vector2 buttonSelectedOriginalPosition;
+    /*
     // Use this for initialization
     void Start()
     {
@@ -28,27 +29,23 @@ public class ShopItemListManager : MonoBehaviour {
 
             itemsArray[c].GetComponent<Button>().onClick.AddListener(test);
         }
-    }
+    }*/
 
     public void test()
     {
         Debug.Log("I am the best programmer in the world");
     }
 
-    public void test(Item item)
-    {
-        Debug.Log("I am the best programmer in the world");
-    }
-
     public void fillItemShop()
     {
-        int x = 0;
-        do
-        {
-            Destroy(itemsArray[x]);
-            x++;
-        } while (x < itemsArray.Length);
-        
+        if(itemsArray != null) {
+            int x = 0;
+            do
+            {
+                Destroy(itemsArray[x]);
+                x++;
+            } while (x < itemsArray.Length);
+        }
 
         //fill the gameobject array
         itemsArray = new GameObject[shopItems.Count];
@@ -66,12 +63,15 @@ public class ShopItemListManager : MonoBehaviour {
 
     public void fillEmeraldShop()
     {
-        int x = 0;
-        do
+        if (itemsArray != null)
         {
-            Destroy(itemsArray[x]);
-            x++;
-        } while (x < itemsArray.Length);
+            int x = 0;
+            do
+            {
+                Destroy(itemsArray[x]);
+                x++;
+            } while (x < itemsArray.Length);
+        }
 
         //fill the gameobject array
         itemsArray = new GameObject[shopEmeralds.Count];
@@ -89,12 +89,15 @@ public class ShopItemListManager : MonoBehaviour {
 
     public void fillCoinShop()
     {
-        int x = 0;
-        do
+        if (itemsArray != null)
         {
-            Destroy(itemsArray[x]);
-            x++;
-        } while (x < itemsArray.Length);
+            int x = 0;
+            do
+            {
+                Destroy(itemsArray[x]);
+                x++;
+            } while (x < itemsArray.Length);
+        }
 
         //fill the gameobject array
         itemsArray = new GameObject[shopCoins.Count];
@@ -110,8 +113,18 @@ public class ShopItemListManager : MonoBehaviour {
         }
     }
 
-    // Update is called once per frame
-    void Update () {
-		
-	}
+
+    public void SelectButton(GameObject buttonSelected)
+    {
+        if(this.buttonSelected != null)//restore previous selected button in his original position
+        {
+            this.buttonSelected.transform.position = buttonSelectedOriginalPosition;
+        }
+
+        this.buttonSelected = buttonSelected;
+        buttonSelectedOriginalPosition = buttonSelected.transform.position;
+
+        buttonSelected.transform.position = buttonSelected.transform.position + new Vector3(0, 40f);
+    }
+    
 }
