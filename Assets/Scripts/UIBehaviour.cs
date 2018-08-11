@@ -180,7 +180,7 @@ public class UIBehaviour : MonoBehaviour
 
         State = UIAnimationStates.Default;
 
-        GoldText.text = "" + PlayerPrefs.GetInt("Coins");
+        //GoldText.text = "" + PlayerPrefs.GetInt("Coins");
         //EmeraldText.text = "" + PlayerPrefs.GetInt("Emeralds");
 
         HeartObjects = new List<GameObject>();
@@ -376,7 +376,7 @@ public class UIBehaviour : MonoBehaviour
 
         if (PanelName == "MainMenuPanel")
         {
-            GoldText.text = "" + PlayerPrefs.GetInt("Coins");
+            //GoldText.text = "" + PlayerPrefs.GetInt("Coins");
             //EmeraldText.text = "" + PlayerPrefs.GetInt("Emeralds");
         }
     }
