@@ -917,4 +917,9 @@ public class GameBehaviour : MonoBehaviour
             }
         }
     }
+
+    public static GameObject PrefabLoader(string prefabName)
+    {
+        return Resources.Load<GameObject>("Prefabs/" + prefabName);
+    }
 }
